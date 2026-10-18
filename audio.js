@@ -74,9 +74,24 @@
   }
   if ('speechSynthesis' in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
   let lastLine = '';
+  // Recorded ElevenLabs voices: text -> mp3. Falls back to the phone's voice for anything not recorded.
+  const VO_INDEX = window.SG_VO || {};
+  const vkey = (t) => t.normalize('NFKD').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const player = new Audio(); player.preload = 'auto';
+  player.addEventListener('playing', () => duck(true));
+  player.addEventListener('ended', () => duck(false));
+  player.addEventListener('pause', () => duck(false));
+  function stopVoice() { try { player.pause(); } catch (_) {} if ('speechSynthesis' in window) speechSynthesis.cancel(); }
   function say(who, text) {
-    if (!S.voice || !('speechSynthesis' in window) || !text) return;
-    speechSynthesis.cancel();
+    if (!S.voice || !text) return;
+    stopVoice();
+    const file = VO_INDEX[vkey(text)];
+    if (file) {
+      player.src = 'vo/' + file; player.currentTime = 0;
+      const p = player.play(); if (p && p.catch) p.catch(() => {});
+      return;
+    }
+    if (!('speechSynthesis' in window)) return;
     const clean = text.replace(/[★☆✓→←·]/g, ' ').replace(/\+(\d+)/g, 'plus $1');
     const u = new SpeechSynthesisUtterance(clean);
     const p = VO[who] || VO['pet'];
@@ -89,6 +104,7 @@
     if (unlocked) return; unlocked = true;
     const c = ac(); if (c && c.state === 'suspended') c.resume();
     if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); }
+    try { player.src = 'data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQxAADB8AhSmxhIIEVCSiJrDCQBTcu3UrAIwUdkRgQbFAZC1CQEwTJ9mjRvBA4UOLD8nKVOWfh+UlK3z/177OXrfOdKl7pyn3Xf//WreyTRUoAWgBgkOAGbZHBgG1OF6zM82DWbZaUmMBptgQhGjsyYqc9ae9XFz280948NMBWInljyzsNRFLPWdnZGWrddDsjK1unuSrVN9jJsK8KuQtQCtMBjCEtImISdNKJOopIpBFpNSMbIHCSRpRR5iakjTiyzLhchUUBwCgyKiweBv/7UsQbg8isVNoMPMjAAAA0gAAABEVFGmgqK////9bP/6XCykxBTUUzLjEwMKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq'; const p = player.play(); if (p && p.catch) p.catch(() => {}); } catch (_) {}
     setMusic(S.music);
     setTimeout(() => window.App && App.render && App.render(), 50);
   }
@@ -98,7 +114,7 @@
   const INSTR = { Ghanti: 'ghanti', Shankh: 'shankh', Dholak: 'dholak', Bansuri: 'bansuri' };
   let lastLit = '';
   window.SGAudio = {
-    onNavigate() { lastLine = ''; lastLit = ''; if ('speechSynthesis' in window) speechSynthesis.cancel(); },
+    onNavigate() { lastLine = ''; lastLit = ''; stopVoice(); },
     afterRender(screen, root) {
       root.querySelectorAll('[data-audio-toggle]').forEach((b) => {
         const k = b.getAttribute('data-audio-toggle'); const on = S[k];
@@ -134,7 +150,7 @@
 
   document.addEventListener('click', (e) => {
     const tg = e.target.closest && e.target.closest('[data-audio-toggle]');
-    if (tg) { const k = tg.getAttribute('data-audio-toggle'); S[k] = !S[k]; store.set(k, S[k]); if (k === 'music') setMusic(S[k]); if (k === 'voice' && !S[k] && 'speechSynthesis' in window) speechSynthesis.cancel(); window.App && App.render(); e.preventDefault(); return; }
+    if (tg) { const k = tg.getAttribute('data-audio-toggle'); S[k] = !S[k]; store.set(k, S[k]); if (k === 'music') setMusic(S[k]); if (k === 'voice' && !S[k]) stopVoice(); window.App && App.render(); e.preventDefault(); return; }
     if (!S.sfx || !ctx) return;
     const b = e.target.closest && e.target.closest('button, a');
     if (!b) return;
