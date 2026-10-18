@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FBF5E8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Sneh Gurukul">
+<meta name="description" content="Sneh Gurukul kids learning app prototype: Acharya Ji, Sneh Didi, pet buddies and your own Gurukul village.">
+<title>Sneh Gurukul</title>
+<link rel="icon" href="img/p_elephant.webp">
+<link rel="apple-touch-icon" href="img/p_elephant.webp">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Mukta:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;height:100%;background:#F3E6CF;overscroll-behavior:none}
+  body{display:flex;align-items:center;justify-content:center;font-family:'Mukta',sans-serif;-webkit-tap-highlight-color:transparent}
+  #stage{position:relative;overflow:hidden;border-radius:0}
+  @media (min-width:600px){#stage{border-radius:28px;box-shadow:0 20px 60px rgba(58,31,20,.25)}}
+  #frame{width:390px;height:844px;transform-origin:0 0;position:absolute;left:0;top:0}
+  #screen{width:390px;height:844px;position:relative;overflow:hidden}
+  a{color:inherit}
+  button{-webkit-appearance:none}
+  input::placeholder{color:#8A7A70}
+  input{font-family:'Baloo 2',sans-serif}
+  .pet{transition:transform .15s ease}.pet:hover{transform:translateY(-4px)}
+  noscript{padding:24px;text-align:center}
+</style>
+</head>
+<body>
+<div id="stage"><div id="frame"><div id="screen"></div></div></div>
+<noscript>Please turn on JavaScript to open the Sneh Gurukul app.</noscript>
+<script src="audio.js"></script>
+<script src="runtime.js"></script>
+<script src="screens.js"></script>
+</body>
+</html>
